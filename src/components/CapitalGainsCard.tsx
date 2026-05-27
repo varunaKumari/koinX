@@ -10,7 +10,11 @@ interface CapitalGainsCardProps {
 
 const formatCurrency = (value: number, compact = false) => {
   const formatter = new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: compact ? 2 : Math.abs(value) > 0 && Math.abs(value) < 0.01 ? 6 : 2,
+    maximumFractionDigits: compact
+      ? 2
+      : Math.abs(value) > 0 && Math.abs(value) < 0.01
+        ? 6
+        : 2,
     minimumFractionDigits: compact ? 0 : 2,
     notation: compact ? 'compact' : 'standard',
   })
@@ -44,7 +48,7 @@ export const CapitalGainsCard = ({
 
   if (!gains) {
     return (
-      <section className={`min-h-[260px] rounded-lg p-6 ${cardClass}`}>
+      <section className={`min-h-[340px] rounded-lg p-6 md:min-h-[410px] ${cardClass}`}>
         <div className="h-8 w-48 animate-pulse rounded bg-white/20" />
         <div className="mt-8 space-y-5">
           <div className="h-7 animate-pulse rounded bg-white/15" />
@@ -66,10 +70,10 @@ export const CapitalGainsCard = ({
   ]
 
   return (
-    <section className={`min-h-[260px] rounded-lg p-6 ${cardClass}`}>
+    <section className={`min-h-[340px] rounded-lg p-6 md:min-h-[410px] ${cardClass}`}>
       <h2 className="text-2xl font-semibold">{title}</h2>
 
-      <div className="mt-7 grid grid-cols-[1.2fr_1fr_1fr] gap-x-6 gap-y-5 text-base sm:text-lg">
+      <div className="mt-8 grid grid-cols-[1.2fr_1fr_1fr] gap-x-6 gap-y-6 text-base sm:text-xl">
         <span />
         <span className={`${mutedClass} text-right font-medium`}>Short-term</span>
         <span className={`${mutedClass} text-right font-medium`}>Long-term</span>
@@ -101,7 +105,9 @@ export const CapitalGainsCard = ({
         <span className="text-xl font-semibold sm:text-2xl">
           {isPost ? 'Effective Capital Gains:' : 'Realised Capital Gains:'}
         </span>
-        <span className={`text-2xl font-semibold sm:text-3xl ${valueColor(totalGains)}`}>
+        <span
+          className={`text-2xl font-semibold sm:text-3xl ${valueColor(totalGains)}`}
+        >
           {formatCurrency(totalGains, Math.abs(totalGains) >= 1_000_000)}
         </span>
       </div>

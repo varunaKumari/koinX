@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { getHoldingKey } from '../hooks/useHarvesting'
 import type { Holding } from '../types'
 
@@ -37,6 +37,8 @@ const formatHolding = (value: number) =>
     maximumFractionDigits: Math.abs(value) > 0 && Math.abs(value) < 0.01 ? 6 : 8,
   }).format(value)
 
+type SortDirection = 'asc' | 'desc'
+
 export const HoldingsTable = ({
   holdings,
   mode,
@@ -47,6 +49,7 @@ export const HoldingsTable = ({
 }: HoldingsTableProps) => {
   const isDark = mode === 'dark'
   const [showAll, setShowAll] = useState(false)
+  const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
   const headerCheckboxRef = useRef<HTMLInputElement>(null)
   const sectionClass = isDark
     ? 'border-slate-800 bg-[#111827] text-white'
@@ -74,10 +77,11 @@ export const HoldingsTable = ({
     () =>
       [...holdings].sort(
         (firstHolding, secondHolding) =>
-          Math.abs(secondHolding.stcg.gain + secondHolding.ltcg.gain) -
-          Math.abs(firstHolding.stcg.gain + firstHolding.ltcg.gain),
+          sortDirection === 'desc'
+            ? secondHolding.stcg.gain - firstHolding.stcg.gain
+            : firstHolding.stcg.gain - secondHolding.stcg.gain,
       ),
-    [holdings],
+    [holdings, sortDirection],
   )
 
   const visibleHoldings = showAll ? sortedHoldings : sortedHoldings.slice(0, 5)
@@ -93,30 +97,43 @@ export const HoldingsTable = ({
     }
   }, [someSelected])
 
+  const ValueWithTooltip = ({
+    children,
+    value,
+    className = '',
+  }: {
+    children: ReactNode
+    value: string
+    className?: string
+  }) => (
+    <span className={`group relative inline-block ${className}`}>
+      {children}
+      <span className="pointer-events-none absolute left-1/2 top-[-3.2rem] z-20 -translate-x-1/2 whitespace-nowrap rounded-lg bg-white px-4 py-3 text-sm text-slate-950 opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+        {value}
+        <span className="absolute left-1/2 top-full h-3 w-3 -translate-x-1/2 -translate-y-1/2 rotate-45 bg-white" />
+      </span>
+    </span>
+  )
+
   return (
     <section
       className={`overflow-hidden rounded border shadow-sm transition-colors duration-300 ${sectionClass}`}
     >
-      <div
-        className={`flex items-center justify-between border-b px-4 py-4 ${topBorderClass}`}
-      >
-        <h2 className="text-base font-semibold">Holdings</h2>
-        <span className={`text-xs ${mutedTextClass}`}>
-          {holdings.length} assets available
-        </span>
+      <div className={`border-b px-6 py-6 ${topBorderClass}`}>
+        <h2 className="text-2xl font-semibold">Holdings</h2>
       </div>
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[760px] border-collapse text-left text-xs sm:min-w-[960px] sm:text-sm">
+        <table className="w-full min-w-[900px] border-collapse text-left text-sm sm:min-w-[1200px]">
           <thead
             className={`text-[11px] uppercase tracking-wide sm:text-xs ${tableHeadClass}`}
           >
             <tr>
-              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
+              <th className="px-4 py-5 font-semibold sm:px-6">
                 <div className="flex items-center gap-2 sm:gap-3">
                   <input
                     aria-label="Select all holdings"
                     checked={allSelected}
-                    className="h-4 w-4 rounded border-slate-500 accent-blue-500 transition duration-150 ease-out checked:scale-110 hover:scale-105"
+                    className="h-5 w-5 rounded border-slate-500 accent-blue-500 transition duration-150 ease-out checked:scale-110 hover:scale-105"
                     disabled={loading || holdings.length === 0}
                     onChange={onToggleAll}
                     ref={headerCheckboxRef}
@@ -125,7 +142,7 @@ export const HoldingsTable = ({
                   <span>Asset</span>
                 </div>
               </th>
-              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
+              <th className="px-4 py-5 font-semibold sm:px-6">
                 <span className="block text-base normal-case tracking-normal text-inherit">
                   Holdings
                 </span>
@@ -133,19 +150,31 @@ export const HoldingsTable = ({
                   Avg Buy Price
                 </span>
               </th>
-              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
+              <th className="px-4 py-5 text-base font-semibold sm:px-6">
                 Current Price
               </th>
-              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
-                <span className="inline-flex items-center gap-3">
-                  <span className="h-0 w-0 border-x-[5px] border-b-[6px] border-x-transparent border-b-current opacity-70" />
+              <th className="px-4 py-5 text-base font-semibold sm:px-6">
+                <button
+                  className="inline-flex items-center gap-3"
+                  onClick={() =>
+                    setSortDirection((currentDirection) =>
+                      currentDirection === 'desc' ? 'asc' : 'desc',
+                    )
+                  }
+                  type="button"
+                >
+                  <span
+                    className={`h-0 w-0 border-x-[5px] border-b-[6px] border-x-transparent border-b-current opacity-70 transition-transform ${
+                      sortDirection === 'desc' ? 'rotate-180' : ''
+                    }`}
+                  />
                   Short-Term
-                </span>
+                </button>
               </th>
-              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
+              <th className="px-4 py-5 text-base font-semibold sm:px-6">
                 Long-Term
               </th>
-              <th className="hidden px-3 py-3 font-semibold sm:table-cell sm:px-4 sm:py-4">
+              <th className="hidden px-4 py-5 text-right text-base font-semibold sm:table-cell sm:px-6">
                 Amount to Sell
               </th>
             </tr>
@@ -156,7 +185,7 @@ export const HoldingsTable = ({
                   <tr className="animate-pulse" key={index}>
                     {Array.from({ length: 6 }).map((__, cellIndex) => (
                       <td
-                        className={`px-3 py-4 sm:px-4 sm:py-5 ${
+                        className={`px-4 py-5 sm:px-6 ${
                           cellIndex === 5 ? 'hidden sm:table-cell' : ''
                         }`}
                         key={cellIndex}
@@ -177,12 +206,12 @@ export const HoldingsTable = ({
                       } ${isSelected ? 'bg-blue-500/15' : ''}`}
                       key={key}
                     >
-                      <td className="px-3 py-3 sm:px-4 sm:py-4">
+                      <td className="px-4 py-5 sm:px-6">
                         <div className="flex items-center gap-2 sm:gap-3">
                           <input
                             aria-label={`Select ${holding.coinName}`}
                             checked={isSelected}
-                            className="h-4 w-4 rounded border-slate-500 accent-blue-500 transition duration-150 ease-out checked:scale-110 hover:scale-105"
+                            className="h-5 w-5 rounded border-slate-500 accent-blue-500 transition duration-150 ease-out checked:scale-110 hover:scale-105"
                             onChange={() => onToggle(key)}
                             type="checkbox"
                           />
@@ -212,7 +241,7 @@ export const HoldingsTable = ({
                           </div>
                         </div>
                       </td>
-                      <td className="px-3 py-3 sm:px-4 sm:py-4">
+                      <td className="px-4 py-5 sm:px-6">
                         <p className="text-base">
                           {formatHolding(holding.totalHolding)} {holding.coin}
                         </p>
@@ -220,35 +249,34 @@ export const HoldingsTable = ({
                           {formatCurrency(holding.averageBuyPrice)}/{holding.coin}
                         </p>
                       </td>
-                      <td
-                        className="px-3 py-3 text-base sm:px-4 sm:py-4"
-                        title={formatCurrency(holding.currentPrice)}
-                      >
-                        {formatCompactCurrency(holding.currentPrice)}
+                      <td className="px-4 py-5 text-base sm:px-6">
+                        <ValueWithTooltip value={formatCurrency(holding.currentPrice)}>
+                          {formatCompactCurrency(holding.currentPrice)}
+                        </ValueWithTooltip>
                       </td>
-                      <td className="px-3 py-3 sm:px-4 sm:py-4">
-                        <p
+                      <td className="px-4 py-5 sm:px-6">
+                        <ValueWithTooltip
                           className={`text-base ${getGainColor(holding.stcg.gain)}`}
-                          title={formatCurrency(holding.stcg.gain)}
+                          value={formatCurrency(holding.stcg.gain)}
                         >
                           {formatCompactCurrency(holding.stcg.gain)}
-                        </p>
+                        </ValueWithTooltip>
                         <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
                           {formatHolding(holding.stcg.balance)} {holding.coin}
                         </p>
                       </td>
-                      <td className="px-3 py-3 sm:px-4 sm:py-4">
-                        <p
+                      <td className="px-4 py-5 sm:px-6">
+                        <ValueWithTooltip
                           className={`text-base ${getGainColor(holding.ltcg.gain)}`}
-                          title={formatCurrency(holding.ltcg.gain)}
+                          value={formatCurrency(holding.ltcg.gain)}
                         >
                           {formatCompactCurrency(holding.ltcg.gain)}
-                        </p>
+                        </ValueWithTooltip>
                         <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
                           {formatHolding(holding.ltcg.balance)} {holding.coin}
                         </p>
                       </td>
-                      <td className="hidden px-3 py-3 text-right text-base sm:table-cell sm:px-4 sm:py-4">
+                      <td className="hidden px-4 py-5 text-right text-base sm:table-cell sm:px-6">
                         {isSelected
                           ? `${formatHolding(holding.totalHolding)} ${holding.coin}`
                           : '-'}
