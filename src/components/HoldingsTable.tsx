@@ -13,12 +13,23 @@ interface HoldingsTableProps {
 
 const formatCurrency = (value: number) => {
   const isVerySmallValue = Math.abs(value) > 0 && Math.abs(value) < 0.01
-  const formatter = new Intl.NumberFormat('en-IN', {
+  const formatter = new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: isVerySmallValue ? 6 : 2,
   })
 
-  return `₹${formatter.format(value)}`
+  return `$${formatter.format(value)}`
+}
+
+const formatCompactCurrency = (value: number) => {
+  if (Math.abs(value) < 1000) {
+    return formatCurrency(value)
+  }
+
+  return `$${new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 2,
+    notation: 'compact',
+  }).format(value)}`
 }
 
 const formatHolding = (value: number) =>
@@ -115,16 +126,24 @@ export const HoldingsTable = ({
                 </div>
               </th>
               <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
-                Holdings & Avg Buy Price
+                <span className="block text-base normal-case tracking-normal text-inherit">
+                  Holdings
+                </span>
+                <span className={`block text-xs normal-case tracking-normal ${mutedTextClass}`}>
+                  Avg Buy Price
+                </span>
               </th>
               <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
                 Current Price
               </th>
               <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
-                Short-Term Gain
+                <span className="inline-flex items-center gap-3">
+                  <span className="h-0 w-0 border-x-[5px] border-b-[6px] border-x-transparent border-b-current opacity-70" />
+                  Short-Term
+                </span>
               </th>
               <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
-                Long-Term Gain
+                Long-Term
               </th>
               <th className="hidden px-3 py-3 font-semibold sm:table-cell sm:px-4 sm:py-4">
                 Amount to Sell
@@ -184,40 +203,55 @@ export const HoldingsTable = ({
                             </div>
                           )}
                           <div>
-                            <p className="font-semibold">{holding.coin}</p>
-                            <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
+                            <p className="max-w-36 truncate text-base font-semibold">
                               {holding.coinName}
+                            </p>
+                            <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
+                              {holding.coin}
                             </p>
                           </div>
                         </div>
                       </td>
                       <td className="px-3 py-3 sm:px-4 sm:py-4">
-                        <p>{formatHolding(holding.totalHolding)}</p>
+                        <p className="text-base">
+                          {formatHolding(holding.totalHolding)} {holding.coin}
+                        </p>
                         <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
-                          Avg. buy {formatCurrency(holding.averageBuyPrice)}
+                          {formatCurrency(holding.averageBuyPrice)}/{holding.coin}
+                        </p>
+                      </td>
+                      <td
+                        className="px-3 py-3 text-base sm:px-4 sm:py-4"
+                        title={formatCurrency(holding.currentPrice)}
+                      >
+                        {formatCompactCurrency(holding.currentPrice)}
+                      </td>
+                      <td className="px-3 py-3 sm:px-4 sm:py-4">
+                        <p
+                          className={`text-base ${getGainColor(holding.stcg.gain)}`}
+                          title={formatCurrency(holding.stcg.gain)}
+                        >
+                          {formatCompactCurrency(holding.stcg.gain)}
+                        </p>
+                        <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
+                          {formatHolding(holding.stcg.balance)} {holding.coin}
                         </p>
                       </td>
                       <td className="px-3 py-3 sm:px-4 sm:py-4">
-                        {formatCurrency(holding.currentPrice)}
-                      </td>
-                      <td className="px-3 py-3 sm:px-4 sm:py-4">
-                        <p className={getGainColor(holding.stcg.gain)}>
-                          {formatCurrency(holding.stcg.gain)}
+                        <p
+                          className={`text-base ${getGainColor(holding.ltcg.gain)}`}
+                          title={formatCurrency(holding.ltcg.gain)}
+                        >
+                          {formatCompactCurrency(holding.ltcg.gain)}
                         </p>
                         <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
-                          {formatCurrency(holding.stcg.balance)}
+                          {formatHolding(holding.ltcg.balance)} {holding.coin}
                         </p>
                       </td>
-                      <td className="px-3 py-3 sm:px-4 sm:py-4">
-                        <p className={getGainColor(holding.ltcg.gain)}>
-                          {formatCurrency(holding.ltcg.gain)}
-                        </p>
-                        <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
-                          {formatCurrency(holding.ltcg.balance)}
-                        </p>
-                      </td>
-                      <td className="hidden px-3 py-3 sm:table-cell sm:px-4 sm:py-4">
-                        {isSelected ? formatHolding(holding.totalHolding) : ''}
+                      <td className="hidden px-3 py-3 text-right text-base sm:table-cell sm:px-4 sm:py-4">
+                        {isSelected
+                          ? `${formatHolding(holding.totalHolding)} ${holding.coin}`
+                          : '-'}
                       </td>
                     </tr>
                   )

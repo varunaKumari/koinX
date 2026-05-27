@@ -3,66 +3,53 @@ import type { CapitalGains } from '../types'
 interface CapitalGainsCardProps {
   gains: CapitalGains | null
   mode: 'light' | 'dark'
+  savings?: number
   variant: 'pre' | 'post'
   title: string
 }
 
-const formatCurrency = (value: number) => {
-  const isVerySmallValue = Math.abs(value) > 0 && Math.abs(value) < 0.01
-  const formatter = new Intl.NumberFormat('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: isVerySmallValue ? 6 : 2,
+const formatCurrency = (value: number, compact = false) => {
+  const formatter = new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: compact ? 2 : Math.abs(value) > 0 && Math.abs(value) < 0.01 ? 6 : 2,
+    minimumFractionDigits: compact ? 0 : 2,
+    notation: compact ? 'compact' : 'standard',
   })
 
-  return `₹${formatter.format(value)}`
+  return `$${formatter.format(value)}`
 }
 
 export const CapitalGainsCard = ({
   gains,
   mode,
+  savings = 0,
   variant,
   title,
 }: CapitalGainsCardProps) => {
   const isDark = mode === 'dark'
-  const cardClass =
-    variant === 'pre'
-      ? isDark
-        ? 'border border-slate-700 bg-[#101726] text-white'
-        : 'border border-slate-200 bg-white text-slate-950'
-      : 'border border-blue-400/30 bg-[#0b84ff] text-white'
-  const mutedTextClass =
-    variant === 'post' || isDark ? 'text-white/70' : 'text-slate-500'
-  const tableSurfaceClass =
-    variant === 'post'
-      ? 'border-white/15 bg-black/10'
-      : isDark
-        ? 'border-white/15 bg-black/10'
-        : 'border-slate-200 bg-slate-50'
-  const dividerClass =
-    variant === 'post' || isDark ? 'divide-white/10' : 'divide-slate-200'
-  const headerBorderClass =
-    variant === 'post' || isDark ? 'border-white/15' : 'border-slate-200'
-  const topBorderClass =
-    variant === 'post' || isDark ? 'border-white/20' : 'border-slate-200'
-  const labelClass = variant === 'post' || isDark ? 'text-white' : 'text-slate-950'
-  const mobileLabelClass =
-    variant === 'post' || isDark ? 'text-white/50' : 'text-slate-400'
-  const getValueColor = (value: number) =>
-    value >= 0
-      ? variant === 'post' || isDark
-        ? 'text-emerald-300'
-        : 'text-emerald-600'
-      : variant === 'post' || isDark
-        ? 'text-red-300'
+  const isPost = variant === 'post'
+  const cardClass = isPost
+    ? 'bg-[#1677ff] text-white shadow-[0_18px_40px_rgba(22,119,255,0.16)]'
+    : isDark
+      ? 'bg-[#171821] text-white'
+      : 'border border-slate-200 bg-white text-slate-950'
+  const mutedClass = isPost || isDark ? 'text-white/78' : 'text-slate-500'
+  const valueColor = (value: number) =>
+    value < 0
+      ? isPost || isDark
+        ? 'text-white'
         : 'text-red-600'
+      : isPost || isDark
+        ? 'text-white'
+        : 'text-emerald-600'
 
   if (!gains) {
     return (
-      <section className={`rounded p-5 shadow-sm sm:p-6 ${cardClass}`}>
-        <div className="h-7 w-48 animate-pulse rounded bg-white/20" />
-        <div className="mt-6 space-y-4">
-          <div className="h-28 animate-pulse rounded bg-white/15" />
-          <div className="h-8 w-72 max-w-full animate-pulse rounded bg-white/20" />
+      <section className={`min-h-[260px] rounded-lg p-6 ${cardClass}`}>
+        <div className="h-8 w-48 animate-pulse rounded bg-white/20" />
+        <div className="mt-8 space-y-5">
+          <div className="h-7 animate-pulse rounded bg-white/15" />
+          <div className="h-7 animate-pulse rounded bg-white/15" />
+          <div className="h-7 animate-pulse rounded bg-white/15" />
         </div>
       </section>
     )
@@ -70,76 +57,61 @@ export const CapitalGainsCard = ({
 
   const stcgNet = gains.stcg.profits - gains.stcg.losses
   const ltcgNet = gains.ltcg.profits - gains.ltcg.losses
-  const realisedCapitalGains = stcgNet + ltcgNet
-
-  const sections = [
+  const totalGains = stcgNet + ltcgNet
+  const useCompactNumbers = Math.abs(totalGains) >= 1_000_000
+  const rows = [
     { label: 'Profits', stcg: gains.stcg.profits, ltcg: gains.ltcg.profits },
     { label: 'Losses', stcg: gains.stcg.losses, ltcg: gains.ltcg.losses },
     { label: 'Net Capital Gains', stcg: stcgNet, ltcg: ltcgNet },
   ]
 
   return (
-    <section className={`rounded p-5 shadow-sm sm:p-6 ${cardClass}`}>
-      <h2 className="text-base font-semibold sm:text-lg">{title}</h2>
+    <section className={`min-h-[260px] rounded-lg p-6 ${cardClass}`}>
+      <h2 className="text-2xl font-semibold">{title}</h2>
 
-      <div className={`mt-5 overflow-hidden rounded border ${tableSurfaceClass}`}>
-        <div
-          className={`grid grid-cols-3 border-b px-3 py-3 text-xs font-semibold sm:px-4 ${headerBorderClass} ${mutedTextClass}`}
-        >
-          <span />
-          <span className="text-right">Short-term</span>
-          <span className="text-right">Long-term</span>
-        </div>
-        <div className={`divide-y ${dividerClass}`}>
-          {sections.map((section) => {
-            const isNetRow = section.label === 'Net Capital Gains'
+      <div className="mt-7 grid grid-cols-[1.2fr_1fr_1fr] gap-x-6 gap-y-5 text-base sm:text-lg">
+        <span />
+        <span className={`${mutedClass} text-right font-medium`}>Short-term</span>
+        <span className={`${mutedClass} text-right font-medium`}>Long-term</span>
 
-            return (
-              <div
-                className="grid grid-cols-1 gap-1 px-3 py-3 text-sm sm:grid-cols-3 sm:items-center sm:gap-4 sm:px-4"
-                key={section.label}
+        {rows.map((row) => {
+          const isNet = row.label === 'Net Capital Gains'
+
+          return (
+            <div className="contents" key={row.label}>
+              <span className={`${isNet ? 'font-semibold' : ''} ${mutedClass}`}>
+                {row.label}
+              </span>
+              <span
+                className={`text-right ${isNet ? `font-semibold ${valueColor(row.stcg)}` : ''}`}
               >
-                <span
-                  className={`${mutedTextClass} ${
-                    isNetRow ? `font-semibold ${labelClass}` : ''
-                  }`}
-                >
-                  {section.label}
-                </span>
-                <span
-                  className={`sm:text-right ${
-                    isNetRow ? getValueColor(section.stcg) : ''
-                  }`}
-                >
-                  <span className={`mr-2 text-xs sm:hidden ${mobileLabelClass}`}>
-                    Short-term
-                  </span>
-                  {formatCurrency(section.stcg)}
-                </span>
-                <span
-                  className={`sm:text-right ${
-                    isNetRow ? getValueColor(section.ltcg) : ''
-                  }`}
-                >
-                  <span className={`mr-2 text-xs sm:hidden ${mobileLabelClass}`}>
-                    Long-term
-                  </span>
-                  {formatCurrency(section.ltcg)}
-                </span>
-              </div>
-            )
-          })}
-        </div>
+                {formatCurrency(row.stcg, useCompactNumbers)}
+              </span>
+              <span
+                className={`text-right ${isNet ? `font-semibold ${valueColor(row.ltcg)}` : ''}`}
+              >
+                {formatCurrency(row.ltcg, useCompactNumbers)}
+              </span>
+            </div>
+          )
+        })}
       </div>
 
-      <div
-        className={`mt-5 flex flex-col gap-2 border-t pt-4 text-sm font-semibold sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-base ${topBorderClass}`}
-      >
-        <span>Realised Capital Gains</span>
-        <span className={`text-lg sm:text-xl ${getValueColor(realisedCapitalGains)}`}>
-          {formatCurrency(realisedCapitalGains)}
+      <div className="mt-8 flex flex-wrap items-baseline gap-x-6 gap-y-2">
+        <span className="text-xl font-semibold sm:text-2xl">
+          {isPost ? 'Effective Capital Gains:' : 'Realised Capital Gains:'}
+        </span>
+        <span className={`text-2xl font-semibold sm:text-3xl ${valueColor(totalGains)}`}>
+          {formatCurrency(totalGains, Math.abs(totalGains) >= 1_000_000)}
         </span>
       </div>
+
+      {isPost && savings > 0 ? (
+        <p className="mt-5 text-base font-medium text-white">
+          🎉 Your taxable capital gains are reduced by:{' '}
+          {formatCurrency(savings, savings >= 1_000_000)}
+        </p>
+      ) : null}
     </section>
   )
 }
