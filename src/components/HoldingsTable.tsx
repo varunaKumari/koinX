@@ -10,9 +10,20 @@ interface HoldingsTableProps {
   loading: boolean
 }
 
-const formatCurrency = (value: number) => `₹${value.toFixed(2)}`
+const formatCurrency = (value: number) => {
+  const isVerySmallValue = Math.abs(value) > 0 && Math.abs(value) < 0.01
+  const formatter = new Intl.NumberFormat('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: isVerySmallValue ? 6 : 2,
+  })
 
-const formatHolding = (value: number) => value.toLocaleString('en-IN')
+  return `₹${formatter.format(value)}`
+}
+
+const formatHolding = (value: number) =>
+  new Intl.NumberFormat('en-IN', {
+    maximumFractionDigits: Math.abs(value) > 0 && Math.abs(value) < 0.01 ? 6 : 8,
+  }).format(value)
 
 const getGainColor = (value: number) =>
   value >= 0 ? 'text-emerald-300' : 'text-red-300'
@@ -61,7 +72,7 @@ export const HoldingsTable = ({
                   <input
                     aria-label="Select all holdings"
                     checked={allSelected}
-                    className="h-4 w-4 rounded border-slate-500 accent-blue-500"
+                    className="h-4 w-4 rounded border-slate-500 accent-blue-500 transition duration-150 ease-out checked:scale-110 hover:scale-105"
                     disabled={loading || holdings.length === 0}
                     onChange={onToggleAll}
                     ref={headerCheckboxRef}
@@ -108,13 +119,18 @@ export const HoldingsTable = ({
                   const isSelected = selectedCoins.has(key)
 
                   return (
-                    <tr className="transition-colors hover:bg-white/5" key={key}>
+                    <tr
+                      className={`transition-colors duration-200 hover:bg-white/5 ${
+                        isSelected ? 'bg-blue-500/10' : ''
+                      }`}
+                      key={key}
+                    >
                       <td className="px-3 py-3 sm:px-4 sm:py-4">
                         <div className="flex items-center gap-2 sm:gap-3">
                           <input
                             aria-label={`Select ${holding.coinName}`}
                             checked={isSelected}
-                            className="h-4 w-4 rounded border-slate-500 accent-blue-500"
+                            className="h-4 w-4 rounded border-slate-500 accent-blue-500 transition duration-150 ease-out checked:scale-110 hover:scale-105"
                             onChange={() => onToggle(key)}
                             type="checkbox"
                           />
@@ -122,6 +138,9 @@ export const HoldingsTable = ({
                             <img
                               alt=""
                               className="h-7 w-7 rounded-full sm:h-8 sm:w-8"
+                              onError={(event) => {
+                                event.currentTarget.src = '/default-coin.svg'
+                              }}
                               src={holding.logo}
                             />
                           ) : (

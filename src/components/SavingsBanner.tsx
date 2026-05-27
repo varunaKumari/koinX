@@ -11,6 +11,16 @@ const getTotalGains = (gains: CapitalGains) =>
   gains.ltcg.profits -
   gains.ltcg.losses
 
+const formatCurrency = (value: number) => {
+  const isVerySmallValue = Math.abs(value) > 0 && Math.abs(value) < 0.01
+  const formatter = new Intl.NumberFormat('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: isVerySmallValue ? 6 : 2,
+  })
+
+  return `₹${formatter.format(value)}`
+}
+
 export const SavingsBanner = ({
   preGains,
   postGains,
@@ -46,7 +56,7 @@ export const SavingsBanner = ({
           </svg>
         </span>
         <p className="text-base font-semibold">
-          You're going to save ₹{(preTotal - postTotal).toFixed(2)}
+          You're going to save {formatCurrency(preTotal - postTotal)}
         </p>
       </div>
     </div>

@@ -43,15 +43,15 @@ function App() {
                 i
               </button>
               <div className="pointer-events-none absolute right-0 top-8 z-10 w-64 rounded-md border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-slate-200 opacity-0 shadow-lg transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 sm:left-1/2 sm:w-72 sm:-translate-x-1/2">
-                Tax loss harvesting is a strategy that can help offset capital
-                gains by selling assets at a loss.
+                Tax loss harvesting helps you reduce your tax liability by
+                selling assets at a loss to offset capital gains.
               </div>
             </div>
           </div>
 
           {error ? (
             <div className="rounded-lg border border-red-500/40 bg-red-950/40 px-4 py-3 text-sm text-red-200">
-              {error}
+              Failed to load data. Please refresh.
             </div>
           ) : null}
 

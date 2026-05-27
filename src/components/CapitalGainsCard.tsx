@@ -6,7 +6,15 @@ interface CapitalGainsCardProps {
   title: string
 }
 
-const formatCurrency = (value: number) => `₹${value.toFixed(2)}`
+const formatCurrency = (value: number) => {
+  const isVerySmallValue = Math.abs(value) > 0 && Math.abs(value) < 0.01
+  const formatter = new Intl.NumberFormat('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: isVerySmallValue ? 6 : 2,
+  })
+
+  return `₹${formatter.format(value)}`
+}
 
 const getValueColor = (value: number) =>
   value >= 0 ? 'text-emerald-300' : 'text-red-300'
