@@ -19,12 +19,13 @@ function App() {
   const postGains = loading ? null : afterHarvestingGains
 
   return (
-    <div className="min-h-screen bg-[#0d1117] text-white">
-      <nav className="border-b border-white/10 bg-[#0d1117]/95 px-4 py-4 md:px-8">
+    <div className="min-h-screen bg-[#090d16] text-white">
+      <nav className="border-b border-slate-800 bg-[#0b1120] px-4 py-4 md:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <span className="text-xl font-bold tracking-tight text-white">
-            KoinX
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-bold text-[#f6b21a]">Koin</span>
+            <span className="text-sm font-bold text-[#2f8cff]">X</span>
+          </div>
         </div>
       </nav>
 
@@ -54,6 +55,28 @@ function App() {
               Failed to load data. Please refresh.
             </div>
           ) : null}
+
+          <section className="rounded border border-blue-500/20 bg-[#111827] p-4 text-sm text-slate-300 shadow-sm">
+            <details open>
+              <summary className="cursor-pointer select-none text-base font-semibold text-white">
+                How it works?
+              </summary>
+              <ul className="mt-3 list-disc space-y-2 pl-5 leading-relaxed">
+                <li>
+                  Select one or more holdings to simulate selling them for tax
+                  loss harvesting.
+                </li>
+                <li>
+                  Your short-term and long-term gains update instantly in the
+                  after harvesting card.
+                </li>
+                <li>
+                  Assets with losses can reduce realised capital gains, while
+                  profitable assets increase them.
+                </li>
+              </ul>
+            </details>
+          </section>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <CapitalGainsCard

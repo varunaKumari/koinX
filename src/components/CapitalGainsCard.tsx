@@ -26,16 +26,15 @@ export const CapitalGainsCard = ({
 }: CapitalGainsCardProps) => {
   const cardClass =
     variant === 'pre'
-      ? 'bg-[#1a1f2e] text-white'
-      : 'bg-[#1565C0] text-white'
+      ? 'border border-slate-700 bg-[#101726] text-white'
+      : 'border border-blue-400/30 bg-[#0b84ff] text-white'
 
   if (!gains) {
     return (
-      <section className={`rounded-lg p-5 shadow-sm sm:p-6 ${cardClass}`}>
+      <section className={`rounded p-5 shadow-sm sm:p-6 ${cardClass}`}>
         <div className="h-7 w-48 animate-pulse rounded bg-white/20" />
-        <div className="mt-6 space-y-5">
-          <div className="h-24 animate-pulse rounded bg-white/15" />
-          <div className="h-24 animate-pulse rounded bg-white/15" />
+        <div className="mt-6 space-y-4">
+          <div className="h-28 animate-pulse rounded bg-white/15" />
           <div className="h-8 w-72 max-w-full animate-pulse rounded bg-white/20" />
         </div>
       </section>
@@ -47,44 +46,64 @@ export const CapitalGainsCard = ({
   const realisedCapitalGains = stcgNet + ltcgNet
 
   const sections = [
-    { label: 'Short-term', gains: gains.stcg, net: stcgNet },
-    { label: 'Long-term', gains: gains.ltcg, net: ltcgNet },
+    { label: 'Profits', stcg: gains.stcg.profits, ltcg: gains.ltcg.profits },
+    { label: 'Losses', stcg: gains.stcg.losses, ltcg: gains.ltcg.losses },
+    { label: 'Net Capital Gains', stcg: stcgNet, ltcg: ltcgNet },
   ]
 
   return (
-    <section className={`rounded-lg p-5 shadow-sm sm:p-6 ${cardClass}`}>
-      <h2 className="text-lg font-semibold sm:text-xl">{title}</h2>
+    <section className={`rounded p-5 shadow-sm sm:p-6 ${cardClass}`}>
+      <h2 className="text-base font-semibold sm:text-lg">{title}</h2>
 
-      <div className="mt-6 space-y-5">
-        {sections.map((section) => (
-          <div
-            className="rounded-lg border border-white/15 bg-white/10 p-4"
-            key={section.label}
-          >
-            <h3 className="text-base font-semibold">{section.label}</h3>
-            <dl className="mt-3 space-y-2 text-sm">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <dt className="text-white/75">Profits</dt>
-                <dd>{formatCurrency(section.gains.profits)}</dd>
+      <div className="mt-5 overflow-hidden rounded border border-white/15 bg-black/10">
+        <div className="grid grid-cols-3 border-b border-white/15 px-3 py-3 text-xs font-semibold text-white/70 sm:px-4">
+          <span />
+          <span className="text-right">Short-term</span>
+          <span className="text-right">Long-term</span>
+        </div>
+        <div className="divide-y divide-white/10">
+          {sections.map((section) => {
+            const isNetRow = section.label === 'Net Capital Gains'
+
+            return (
+              <div
+                className="grid grid-cols-1 gap-1 px-3 py-3 text-sm sm:grid-cols-3 sm:items-center sm:gap-4 sm:px-4"
+                key={section.label}
+              >
+                <span
+                  className={`text-white/75 ${isNetRow ? 'font-semibold text-white' : ''}`}
+                >
+                  {section.label}
+                </span>
+                <span
+                  className={`sm:text-right ${
+                    isNetRow ? getValueColor(section.stcg) : ''
+                  }`}
+                >
+                  <span className="mr-2 text-xs text-white/50 sm:hidden">
+                    Short-term
+                  </span>
+                  {formatCurrency(section.stcg)}
+                </span>
+                <span
+                  className={`sm:text-right ${
+                    isNetRow ? getValueColor(section.ltcg) : ''
+                  }`}
+                >
+                  <span className="mr-2 text-xs text-white/50 sm:hidden">
+                    Long-term
+                  </span>
+                  {formatCurrency(section.ltcg)}
+                </span>
               </div>
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <dt className="text-white/75">Losses</dt>
-                <dd>{formatCurrency(section.gains.losses)}</dd>
-              </div>
-              <div className="flex flex-col gap-1 font-semibold sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                <dt>Net Capital Gains</dt>
-                <dd className={getValueColor(section.net)}>
-                  {formatCurrency(section.net)}
-                </dd>
-              </div>
-            </dl>
-          </div>
-        ))}
+            )
+          })}
+        </div>
       </div>
 
-      <div className="mt-6 flex flex-col gap-2 border-t border-white/20 pt-5 text-sm font-semibold sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-base">
+      <div className="mt-5 flex flex-col gap-2 border-t border-white/20 pt-4 text-sm font-semibold sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-base">
         <span>Realised Capital Gains</span>
-        <span className={getValueColor(realisedCapitalGains)}>
+        <span className={`text-lg sm:text-xl ${getValueColor(realisedCapitalGains)}`}>
           {formatCurrency(realisedCapitalGains)}
         </span>
       </div>

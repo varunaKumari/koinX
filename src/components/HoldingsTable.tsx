@@ -62,10 +62,16 @@ export const HoldingsTable = ({
   }, [someSelected])
 
   return (
-    <section className="overflow-hidden rounded-lg border border-slate-700 bg-[#1a1f2e] text-white shadow-sm">
+    <section className="overflow-hidden rounded border border-slate-800 bg-[#111827] text-white shadow-sm">
+      <div className="flex items-center justify-between border-b border-slate-800 px-4 py-4">
+        <h2 className="text-base font-semibold">Holdings</h2>
+        <span className="text-xs text-slate-400">
+          {holdings.length} assets available
+        </span>
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse text-left text-xs sm:min-w-[960px] sm:text-sm">
-          <thead className="bg-white/5 text-[11px] uppercase tracking-wide text-slate-300 sm:text-xs">
+          <thead className="bg-[#0b1120] text-[11px] uppercase tracking-wide text-slate-300 sm:text-xs">
             <tr>
               <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -98,7 +104,7 @@ export const HoldingsTable = ({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-700">
+          <tbody className="divide-y divide-slate-800">
             {loading
               ? Array.from({ length: 5 }).map((_, index) => (
                   <tr className="animate-pulse" key={index}>
@@ -120,8 +126,8 @@ export const HoldingsTable = ({
 
                   return (
                     <tr
-                      className={`transition-colors duration-200 hover:bg-white/5 ${
-                        isSelected ? 'bg-blue-500/10' : ''
+                      className={`transition-colors duration-200 hover:bg-slate-800/70 ${
+                        isSelected ? 'bg-blue-500/15' : ''
                       }`}
                       key={key}
                     >
@@ -192,7 +198,7 @@ export const HoldingsTable = ({
       </div>
 
       {!loading && sortedHoldings.length > 5 ? (
-        <div className="border-t border-slate-700 px-4 py-4 text-center">
+        <div className="border-t border-slate-800 px-4 py-4 text-center">
           <button
             className="rounded-md px-4 py-2 text-sm font-semibold text-blue-300 transition-colors hover:bg-white/10"
             onClick={() => setShowAll((currentShowAll) => !currentShowAll)}
