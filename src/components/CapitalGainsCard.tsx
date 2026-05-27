@@ -23,7 +23,7 @@ export const CapitalGainsCard = ({
 
   if (!gains) {
     return (
-      <section className={`rounded-lg p-6 shadow-sm ${cardClass}`}>
+      <section className={`rounded-lg p-5 shadow-sm sm:p-6 ${cardClass}`}>
         <div className="h-7 w-48 animate-pulse rounded bg-white/20" />
         <div className="mt-6 space-y-5">
           <div className="h-24 animate-pulse rounded bg-white/15" />
@@ -44,8 +44,8 @@ export const CapitalGainsCard = ({
   ]
 
   return (
-    <section className={`rounded-lg p-6 shadow-sm ${cardClass}`}>
-      <h2 className="text-xl font-semibold">{title}</h2>
+    <section className={`rounded-lg p-5 shadow-sm sm:p-6 ${cardClass}`}>
+      <h2 className="text-lg font-semibold sm:text-xl">{title}</h2>
 
       <div className="mt-6 space-y-5">
         {sections.map((section) => (
@@ -55,15 +55,15 @@ export const CapitalGainsCard = ({
           >
             <h3 className="text-base font-semibold">{section.label}</h3>
             <dl className="mt-3 space-y-2 text-sm">
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <dt className="text-white/75">Profits</dt>
                 <dd>{formatCurrency(section.gains.profits)}</dd>
               </div>
-              <div className="flex items-center justify-between gap-4">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <dt className="text-white/75">Losses</dt>
                 <dd>{formatCurrency(section.gains.losses)}</dd>
               </div>
-              <div className="flex items-center justify-between gap-4 font-semibold">
+              <div className="flex flex-col gap-1 font-semibold sm:flex-row sm:items-center sm:justify-between sm:gap-4">
                 <dt>Net Capital Gains</dt>
                 <dd className={getValueColor(section.net)}>
                   {formatCurrency(section.net)}
@@ -74,7 +74,7 @@ export const CapitalGainsCard = ({
         ))}
       </div>
 
-      <div className="mt-6 flex items-center justify-between gap-4 border-t border-white/20 pt-5 text-base font-semibold">
+      <div className="mt-6 flex flex-col gap-2 border-t border-white/20 pt-5 text-sm font-semibold sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-base">
         <span>Realised Capital Gains</span>
         <span className={getValueColor(realisedCapitalGains)}>
           {formatCurrency(realisedCapitalGains)}

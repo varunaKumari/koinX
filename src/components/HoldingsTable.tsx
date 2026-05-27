@@ -53,11 +53,11 @@ export const HoldingsTable = ({
   return (
     <section className="overflow-hidden rounded-lg border border-slate-700 bg-[#1a1f2e] text-white shadow-sm">
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[960px] border-collapse text-left text-sm">
-          <thead className="bg-white/5 text-xs uppercase tracking-wide text-slate-300">
+        <table className="w-full min-w-[760px] border-collapse text-left text-xs sm:min-w-[960px] sm:text-sm">
+          <thead className="bg-white/5 text-[11px] uppercase tracking-wide text-slate-300 sm:text-xs">
             <tr>
-              <th className="px-4 py-4 font-semibold">
-                <div className="flex items-center gap-3">
+              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
+                <div className="flex items-center gap-2 sm:gap-3">
                   <input
                     aria-label="Select all holdings"
                     checked={allSelected}
@@ -70,13 +70,21 @@ export const HoldingsTable = ({
                   <span>Asset</span>
                 </div>
               </th>
-              <th className="px-4 py-4 font-semibold">
+              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
                 Holdings & Avg Buy Price
               </th>
-              <th className="px-4 py-4 font-semibold">Current Price</th>
-              <th className="px-4 py-4 font-semibold">Short-Term Gain</th>
-              <th className="px-4 py-4 font-semibold">Long-Term Gain</th>
-              <th className="px-4 py-4 font-semibold">Amount to Sell</th>
+              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
+                Current Price
+              </th>
+              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
+                Short-Term Gain
+              </th>
+              <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
+                Long-Term Gain
+              </th>
+              <th className="hidden px-3 py-3 font-semibold sm:table-cell sm:px-4 sm:py-4">
+                Amount to Sell
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-700">
@@ -84,7 +92,12 @@ export const HoldingsTable = ({
               ? Array.from({ length: 5 }).map((_, index) => (
                   <tr className="animate-pulse" key={index}>
                     {Array.from({ length: 6 }).map((__, cellIndex) => (
-                      <td className="px-4 py-5" key={cellIndex}>
+                      <td
+                        className={`px-3 py-4 sm:px-4 sm:py-5 ${
+                          cellIndex === 5 ? 'hidden sm:table-cell' : ''
+                        }`}
+                        key={cellIndex}
+                      >
                         <div className="h-5 rounded bg-white/10" />
                       </td>
                     ))}
@@ -96,8 +109,8 @@ export const HoldingsTable = ({
 
                   return (
                     <tr className="transition-colors hover:bg-white/5" key={key}>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
+                      <td className="px-3 py-3 sm:px-4 sm:py-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           <input
                             aria-label={`Select ${holding.coinName}`}
                             checked={isSelected}
@@ -108,48 +121,48 @@ export const HoldingsTable = ({
                           {holding.logo ? (
                             <img
                               alt=""
-                              className="h-8 w-8 rounded-full"
+                              className="h-7 w-7 rounded-full sm:h-8 sm:w-8"
                               src={holding.logo}
                             />
                           ) : (
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-700 text-xs font-semibold">
+                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-700 text-[11px] font-semibold sm:h-8 sm:w-8 sm:text-xs">
                               {holding.coin.slice(0, 2)}
                             </div>
                           )}
                           <div>
                             <p className="font-semibold">{holding.coin}</p>
-                            <p className="text-xs text-slate-400">
+                            <p className="text-[11px] text-slate-400 sm:text-xs">
                               {holding.coinName}
                             </p>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-3 sm:px-4 sm:py-4">
                         <p>{formatHolding(holding.totalHolding)}</p>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-[11px] text-slate-400 sm:text-xs">
                           Avg. buy {formatCurrency(holding.averageBuyPrice)}
                         </p>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-3 sm:px-4 sm:py-4">
                         {formatCurrency(holding.currentPrice)}
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-3 sm:px-4 sm:py-4">
                         <p className={getGainColor(holding.stcg.gain)}>
                           {formatCurrency(holding.stcg.gain)}
                         </p>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-[11px] text-slate-400 sm:text-xs">
                           {formatCurrency(holding.stcg.balance)}
                         </p>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="px-3 py-3 sm:px-4 sm:py-4">
                         <p className={getGainColor(holding.ltcg.gain)}>
                           {formatCurrency(holding.ltcg.gain)}
                         </p>
-                        <p className="text-xs text-slate-400">
+                        <p className="text-[11px] text-slate-400 sm:text-xs">
                           {formatCurrency(holding.ltcg.balance)}
                         </p>
                       </td>
-                      <td className="px-4 py-4">
+                      <td className="hidden px-3 py-3 sm:table-cell sm:px-4 sm:py-4">
                         {isSelected ? formatHolding(holding.totalHolding) : ''}
                       </td>
                     </tr>
