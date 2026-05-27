@@ -11,7 +11,7 @@
 
 <br />
 
-[🌐 Live Demo](https://your-deployed-link.vercel.app/) · [🎬 Video Walkthrough](#) · [📝 Report Bug](https://github.com/yourusername/koinx-tax-harvesting/issues)
+[🌐 Live Demo](koin-x-lake.vercel.app) · [🎬 Video Walkthrough](#) · [📝 Report Bug](https://github.com/varunaKumari/koinX/issues)
 
 <br />
 
@@ -26,9 +26,9 @@
 
 ## 📸 Preview
 
-| Pre Harvesting | After Harvesting |
+| Dark Mode | Light Mode |
 |:---:|:---:|
-| ![Pre Harvesting](screenshots/pre.png) | ![After Harvesting](screenshots/post.png) |
+| ![Dark Mode](imageSrc/dark.png) | ![Light Mode](imageSrc/light.png) |
 
 > *Select holdings from the table to see your tax savings update in real time*
 
