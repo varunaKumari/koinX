@@ -4,6 +4,7 @@ import type { Holding } from '../types'
 
 interface HoldingsTableProps {
   holdings: Holding[]
+  mode: 'light' | 'dark'
   selectedCoins: Set<string>
   onToggle: (key: string) => void
   onToggleAll: () => void
@@ -25,18 +26,38 @@ const formatHolding = (value: number) =>
     maximumFractionDigits: Math.abs(value) > 0 && Math.abs(value) < 0.01 ? 6 : 8,
   }).format(value)
 
-const getGainColor = (value: number) =>
-  value >= 0 ? 'text-emerald-300' : 'text-red-300'
-
 export const HoldingsTable = ({
   holdings,
+  mode,
   selectedCoins,
   onToggle,
   onToggleAll,
   loading,
 }: HoldingsTableProps) => {
+  const isDark = mode === 'dark'
   const [showAll, setShowAll] = useState(false)
   const headerCheckboxRef = useRef<HTMLInputElement>(null)
+  const sectionClass = isDark
+    ? 'border-slate-800 bg-[#111827] text-white'
+    : 'border-slate-200 bg-white text-slate-950'
+  const topBorderClass = isDark ? 'border-slate-800' : 'border-slate-200'
+  const tableHeadClass = isDark
+    ? 'bg-[#0b1120] text-slate-300'
+    : 'bg-slate-50 text-slate-500'
+  const tableDivideClass = isDark ? 'divide-slate-800' : 'divide-slate-200'
+  const mutedTextClass = isDark ? 'text-slate-400' : 'text-slate-500'
+  const coinFallbackClass = isDark
+    ? 'bg-slate-700 text-white'
+    : 'bg-slate-100 text-slate-600'
+  const skeletonClass = isDark ? 'bg-white/10' : 'bg-slate-200'
+  const getGainColor = (value: number) =>
+    value >= 0
+      ? isDark
+        ? 'text-emerald-300'
+        : 'text-emerald-600'
+      : isDark
+        ? 'text-red-300'
+        : 'text-red-600'
 
   const sortedHoldings = useMemo(
     () =>
@@ -62,16 +83,22 @@ export const HoldingsTable = ({
   }, [someSelected])
 
   return (
-    <section className="overflow-hidden rounded border border-slate-800 bg-[#111827] text-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-slate-800 px-4 py-4">
+    <section
+      className={`overflow-hidden rounded border shadow-sm transition-colors duration-300 ${sectionClass}`}
+    >
+      <div
+        className={`flex items-center justify-between border-b px-4 py-4 ${topBorderClass}`}
+      >
         <h2 className="text-base font-semibold">Holdings</h2>
-        <span className="text-xs text-slate-400">
+        <span className={`text-xs ${mutedTextClass}`}>
           {holdings.length} assets available
         </span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[760px] border-collapse text-left text-xs sm:min-w-[960px] sm:text-sm">
-          <thead className="bg-[#0b1120] text-[11px] uppercase tracking-wide text-slate-300 sm:text-xs">
+          <thead
+            className={`text-[11px] uppercase tracking-wide sm:text-xs ${tableHeadClass}`}
+          >
             <tr>
               <th className="px-3 py-3 font-semibold sm:px-4 sm:py-4">
                 <div className="flex items-center gap-2 sm:gap-3">
@@ -104,7 +131,7 @@ export const HoldingsTable = ({
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800">
+          <tbody className={`divide-y ${tableDivideClass}`}>
             {loading
               ? Array.from({ length: 5 }).map((_, index) => (
                   <tr className="animate-pulse" key={index}>
@@ -115,7 +142,7 @@ export const HoldingsTable = ({
                         }`}
                         key={cellIndex}
                       >
-                        <div className="h-5 rounded bg-white/10" />
+                        <div className={`h-5 rounded ${skeletonClass}`} />
                       </td>
                     ))}
                   </tr>
@@ -126,9 +153,9 @@ export const HoldingsTable = ({
 
                   return (
                     <tr
-                      className={`transition-colors duration-200 hover:bg-slate-800/70 ${
-                        isSelected ? 'bg-blue-500/15' : ''
-                      }`}
+                      className={`transition-colors duration-200 ${
+                        isDark ? 'hover:bg-slate-800/70' : 'hover:bg-blue-50/60'
+                      } ${isSelected ? 'bg-blue-500/15' : ''}`}
                       key={key}
                     >
                       <td className="px-3 py-3 sm:px-4 sm:py-4">
@@ -150,13 +177,15 @@ export const HoldingsTable = ({
                               src={holding.logo}
                             />
                           ) : (
-                            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-slate-700 text-[11px] font-semibold sm:h-8 sm:w-8 sm:text-xs">
+                            <div
+                              className={`flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-semibold sm:h-8 sm:w-8 sm:text-xs ${coinFallbackClass}`}
+                            >
                               {holding.coin.slice(0, 2)}
                             </div>
                           )}
                           <div>
                             <p className="font-semibold">{holding.coin}</p>
-                            <p className="text-[11px] text-slate-400 sm:text-xs">
+                            <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
                               {holding.coinName}
                             </p>
                           </div>
@@ -164,7 +193,7 @@ export const HoldingsTable = ({
                       </td>
                       <td className="px-3 py-3 sm:px-4 sm:py-4">
                         <p>{formatHolding(holding.totalHolding)}</p>
-                        <p className="text-[11px] text-slate-400 sm:text-xs">
+                        <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
                           Avg. buy {formatCurrency(holding.averageBuyPrice)}
                         </p>
                       </td>
@@ -175,7 +204,7 @@ export const HoldingsTable = ({
                         <p className={getGainColor(holding.stcg.gain)}>
                           {formatCurrency(holding.stcg.gain)}
                         </p>
-                        <p className="text-[11px] text-slate-400 sm:text-xs">
+                        <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
                           {formatCurrency(holding.stcg.balance)}
                         </p>
                       </td>
@@ -183,7 +212,7 @@ export const HoldingsTable = ({
                         <p className={getGainColor(holding.ltcg.gain)}>
                           {formatCurrency(holding.ltcg.gain)}
                         </p>
-                        <p className="text-[11px] text-slate-400 sm:text-xs">
+                        <p className={`text-[11px] sm:text-xs ${mutedTextClass}`}>
                           {formatCurrency(holding.ltcg.balance)}
                         </p>
                       </td>
@@ -198,9 +227,13 @@ export const HoldingsTable = ({
       </div>
 
       {!loading && sortedHoldings.length > 5 ? (
-        <div className="border-t border-slate-800 px-4 py-4 text-center">
+        <div className={`border-t px-4 py-4 text-center ${topBorderClass}`}>
           <button
-            className="rounded-md px-4 py-2 text-sm font-semibold text-blue-300 transition-colors hover:bg-white/10"
+            className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
+              isDark
+                ? 'text-blue-300 hover:bg-white/10'
+                : 'text-blue-600 hover:bg-blue-50'
+            }`}
             onClick={() => setShowAll((currentShowAll) => !currentShowAll)}
             type="button"
           >

@@ -2,6 +2,7 @@ import type { CapitalGains } from '../types'
 
 interface CapitalGainsCardProps {
   gains: CapitalGains | null
+  mode: 'light' | 'dark'
   variant: 'pre' | 'post'
   title: string
 }
@@ -16,18 +17,44 @@ const formatCurrency = (value: number) => {
   return `₹${formatter.format(value)}`
 }
 
-const getValueColor = (value: number) =>
-  value >= 0 ? 'text-emerald-300' : 'text-red-300'
-
 export const CapitalGainsCard = ({
   gains,
+  mode,
   variant,
   title,
 }: CapitalGainsCardProps) => {
+  const isDark = mode === 'dark'
   const cardClass =
     variant === 'pre'
-      ? 'border border-slate-700 bg-[#101726] text-white'
+      ? isDark
+        ? 'border border-slate-700 bg-[#101726] text-white'
+        : 'border border-slate-200 bg-white text-slate-950'
       : 'border border-blue-400/30 bg-[#0b84ff] text-white'
+  const mutedTextClass =
+    variant === 'post' || isDark ? 'text-white/70' : 'text-slate-500'
+  const tableSurfaceClass =
+    variant === 'post'
+      ? 'border-white/15 bg-black/10'
+      : isDark
+        ? 'border-white/15 bg-black/10'
+        : 'border-slate-200 bg-slate-50'
+  const dividerClass =
+    variant === 'post' || isDark ? 'divide-white/10' : 'divide-slate-200'
+  const headerBorderClass =
+    variant === 'post' || isDark ? 'border-white/15' : 'border-slate-200'
+  const topBorderClass =
+    variant === 'post' || isDark ? 'border-white/20' : 'border-slate-200'
+  const labelClass = variant === 'post' || isDark ? 'text-white' : 'text-slate-950'
+  const mobileLabelClass =
+    variant === 'post' || isDark ? 'text-white/50' : 'text-slate-400'
+  const getValueColor = (value: number) =>
+    value >= 0
+      ? variant === 'post' || isDark
+        ? 'text-emerald-300'
+        : 'text-emerald-600'
+      : variant === 'post' || isDark
+        ? 'text-red-300'
+        : 'text-red-600'
 
   if (!gains) {
     return (
@@ -55,13 +82,15 @@ export const CapitalGainsCard = ({
     <section className={`rounded p-5 shadow-sm sm:p-6 ${cardClass}`}>
       <h2 className="text-base font-semibold sm:text-lg">{title}</h2>
 
-      <div className="mt-5 overflow-hidden rounded border border-white/15 bg-black/10">
-        <div className="grid grid-cols-3 border-b border-white/15 px-3 py-3 text-xs font-semibold text-white/70 sm:px-4">
+      <div className={`mt-5 overflow-hidden rounded border ${tableSurfaceClass}`}>
+        <div
+          className={`grid grid-cols-3 border-b px-3 py-3 text-xs font-semibold sm:px-4 ${headerBorderClass} ${mutedTextClass}`}
+        >
           <span />
           <span className="text-right">Short-term</span>
           <span className="text-right">Long-term</span>
         </div>
-        <div className="divide-y divide-white/10">
+        <div className={`divide-y ${dividerClass}`}>
           {sections.map((section) => {
             const isNetRow = section.label === 'Net Capital Gains'
 
@@ -71,7 +100,9 @@ export const CapitalGainsCard = ({
                 key={section.label}
               >
                 <span
-                  className={`text-white/75 ${isNetRow ? 'font-semibold text-white' : ''}`}
+                  className={`${mutedTextClass} ${
+                    isNetRow ? `font-semibold ${labelClass}` : ''
+                  }`}
                 >
                   {section.label}
                 </span>
@@ -80,7 +111,7 @@ export const CapitalGainsCard = ({
                     isNetRow ? getValueColor(section.stcg) : ''
                   }`}
                 >
-                  <span className="mr-2 text-xs text-white/50 sm:hidden">
+                  <span className={`mr-2 text-xs sm:hidden ${mobileLabelClass}`}>
                     Short-term
                   </span>
                   {formatCurrency(section.stcg)}
@@ -90,7 +121,7 @@ export const CapitalGainsCard = ({
                     isNetRow ? getValueColor(section.ltcg) : ''
                   }`}
                 >
-                  <span className="mr-2 text-xs text-white/50 sm:hidden">
+                  <span className={`mr-2 text-xs sm:hidden ${mobileLabelClass}`}>
                     Long-term
                   </span>
                   {formatCurrency(section.ltcg)}
@@ -101,7 +132,9 @@ export const CapitalGainsCard = ({
         </div>
       </div>
 
-      <div className="mt-5 flex flex-col gap-2 border-t border-white/20 pt-4 text-sm font-semibold sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-base">
+      <div
+        className={`mt-5 flex flex-col gap-2 border-t pt-4 text-sm font-semibold sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:text-base ${topBorderClass}`}
+      >
         <span>Realised Capital Gains</span>
         <span className={`text-lg sm:text-xl ${getValueColor(realisedCapitalGains)}`}>
           {formatCurrency(realisedCapitalGains)}

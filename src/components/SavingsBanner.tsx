@@ -1,6 +1,7 @@
 import type { CapitalGains } from '../types'
 
 interface SavingsBannerProps {
+  mode: 'light' | 'dark'
   preGains: CapitalGains | null
   postGains: CapitalGains | null
 }
@@ -22,6 +23,7 @@ const formatCurrency = (value: number) => {
 }
 
 export const SavingsBanner = ({
+  mode,
   preGains,
   postGains,
 }: SavingsBannerProps) => {
@@ -37,7 +39,13 @@ export const SavingsBanner = ({
   }
 
   return (
-    <div className="animate-[fade-in_240ms_ease-out] rounded-lg border border-emerald-200 bg-emerald-50 px-5 py-4 text-emerald-900 shadow-sm">
+    <div
+      className={`animate-[fade-in_240ms_ease-out] rounded-lg border px-5 py-4 shadow-sm ${
+        mode === 'dark'
+          ? 'border-emerald-500/30 bg-emerald-500/10 text-emerald-100'
+          : 'border-emerald-200 bg-emerald-50 text-emerald-900'
+      }`}
+    >
       <div className="flex items-center gap-3">
         <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white">
           <svg
